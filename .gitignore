@@ -1,6 +1,8 @@
 .bin
 .env
 bin
+instance
 static/uploads
 *.zip
 __pycache__
+.vscode

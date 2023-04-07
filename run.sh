@@ -35,6 +35,7 @@ check_requirements(){
       echo "NO, copying .env.demo to .env" 
       cp .env.demo .env 
       echo "SECRET_KEY=$(date +%s%N | sha512sum | cut -d' ' -f1)" >> .env
+      echo "SECURITY_PASSWORD_SALT=$(date +%s%N | sha512sum | cut -d' ' -f1)" >> .env
     else
       echo "NO, and neither does .env.demo"
       rc=1

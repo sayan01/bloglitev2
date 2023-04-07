@@ -6,17 +6,13 @@ app = Flask(__name__)
 # configure Flask app
 import config
 
-# Import Flask-WTF forms classes
-from forms import *
-
 # Init DB and declare all db models
 from models import *
 
-# Init Flask_Login Manager
+# Setup flask security
 import auth
 
-# Init routes
-from routes import *
+import api
 
 if __name__ == '__main__':
     app.run()
