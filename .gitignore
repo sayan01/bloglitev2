@@ -1,0 +1,6 @@
+.bin
+.env
+bin
+static/uploads
+*.zip
+__pycache__
