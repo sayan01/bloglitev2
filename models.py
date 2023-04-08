@@ -2,13 +2,10 @@ from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from app import app
-from flask_security.models import fsqla_v3 as fsqla
-from flask_security import hash_password, verify_password
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
-fsqla.FsModels.set_db_info(db)
 
 # Creating Model
 
@@ -16,18 +13,22 @@ followers= db.Table('followers',
                        db.Column('follower_id', db.Integer, db.ForeignKey('user.id')),
                        db.Column('followed_id', db.Integer, db.ForeignKey('user.id'))
                        )
-class Role(db.Model, fsqla.FsRoleMixin):
-    id = db.Column(db.Integer(), primary_key=True)
-    name = db.Column(db.String(80), unique=True)
-    description = db.Column(db.String(255))
-
-    def __repr__(self) -> str:
-        return f'<Role {self.id} "{self.name}">'
-
-class User(db.Model, fsqla.FsUserMixin):
+class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(32), unique=True, nullable=False)
     passhash = db.Column(db.String(512), nullable=False)
+
+    @property
+    def password(self):
+        raise AttributeError('password is not a readible attribute')
+    
+    @password.setter
+    def password(self, password):
+        self.passhash = generate_password_hash(password)
+
+    def verify_password(self, password):
+        return check_password_hash(self.passhash, password)
+
     name = db.Column(db.String(50), nullable=False)
     about = db.Column(db.String(256), nullable=False)
     joined = db.Column(db.DateTime(), nullable=False, default=datetime.utcnow)
@@ -37,34 +38,22 @@ class User(db.Model, fsqla.FsUserMixin):
     comments = db.relationship('Comment', backref='author', cascade="all, delete-orphan")
     votes = db.relationship('Vote', backref='author', cascade="all, delete-orphan")
 
-    list_of_followers = db.relationship('User', secondary=followers,
-                                        primaryjoin=(
-                                            followers.c.follower_id == id),
-                                        secondaryjoin=(
-                                            followers.c.followed_id == id),
-                                        backref=db.backref('followers', lazy='select'), lazy='select')  # many to many relationship with other Users
-                            
-    list_of_following = db.relationship('User', secondary=followers,
-                                        primaryjoin=(
-                                            followers.c.followed_id == id),
-                                        secondaryjoin=(
-                                            followers.c.follower_id == id),
-                                        backref=db.backref('following', lazy='select'), lazy='select')  # many to many relationship with other Users
-
-    @property
-    def password(self):
-        raise AttributeError('password is not a readible attribute')
+    following = db.relationship('User', secondary=followers,
+                                primaryjoin=(followers.c.follower_id == id),
+                                secondaryjoin=(followers.c.followed_id == id),
+                                backref=db.backref('followers', lazy='dynamic'), lazy='dynamic')
     
-    @password.setter
-    def password(self, password):
-        self.passhash = hash_password(password)
-
-    def verify_password(self, password):
-        return verify_password(password, self.passhash)
+    def follow(self, user):
+        if user not in self.following:
+            self.following.append(user)
+    
+    def unfollow(self, user):
+        if user in self.following:
+            self.following.remove(user)
     
     def __repr__(self) -> str:
         return f'<User {self.id} "{self.username}">'
-
+    
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)

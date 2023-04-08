@@ -1,5 +1,8 @@
-from flask_security import Security, SQLAlchemyUserDatastore
+from flask_jwt_extended import JWTManager
 from app import app
-from models import User, Role, db
-user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-security = Security(app, user_datastore, token_authentication_enabled=True)
+from models import User, db
+
+jwt = JWTManager(app)
+
+def current_user(identity):
+    return User.query.get(identity)
