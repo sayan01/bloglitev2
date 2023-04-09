@@ -21,3 +21,7 @@ api.add_resource(UserList, '/user')
 api.add_resource(UserFollow, '/user/follow/<int:id>')
 api.add_resource(CommentDetail, '/comment/<int:id>')
 api.add_resource(CommentList, '/comment')
+
+# photo upload
+from .photo import PhotoUpload
+api.add_resource(PhotoUpload, '/photo')
