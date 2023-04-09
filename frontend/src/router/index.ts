@@ -11,6 +11,12 @@ const router = createRouter({
     { path: '/', name: 'home', component: HomeView, meta: { requiresAuth: true } },
     { path: '/logout', name: 'logout', component: () => import('../views/LogoutView.vue'), meta: { requiresAuth: true } },
     { path: '/profile', name: 'profile', component: () => import('../views/ProfileView.vue'), meta: { requiresAuth: true } },
+    { path: '/profile/edit', name: 'edit-profile', component: () => import('../views/EditProfileView.vue'), meta: { requiresAuth: true } },
+    { path: '/search', name: 'search', component: () => import('../views/SearchView.vue'), meta: { requiresAuth: true } },
+    { path: '/explore/:id', name: 'explore', component: () => import('../views/ExploreView.vue'), meta: { requiresAuth: true } },
+    { path: '/followers/:id', name: 'followers', component: () => import('../views/FollowersView.vue'), meta: { requiresAuth: true } },
+    { path: '/following/:id', name: 'following', component: () => import('../views/FollowingView.vue'), meta: { requiresAuth: true } },
+    { path: '/post/:id/edit', name: 'editpost', component: () => import('../views/EditPostView.vue'), meta: { requiresAuth: true } },
   ]
 })
 

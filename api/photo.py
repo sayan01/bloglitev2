@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from werkzeug.datastructures import FileStorage
 import os
 import uuid
+from api import api
 
 photo_fields = {
     'path': fields.String,
@@ -40,3 +41,5 @@ class PhotoUpload(Resource):
         photo.seek(0)
         photo.save(path)
         return {'path': path}, 201
+
+api.add_resource(PhotoUpload, '/photo')

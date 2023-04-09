@@ -2,6 +2,7 @@ from models import Post, User, db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from auth import current_user
 from flask_restful import Resource, fields, marshal_with, reqparse, marshal, abort
+from api import api
 
 post_fields = {
     'id': fields.Integer,
@@ -16,7 +17,6 @@ post_parser = reqparse.RequestParser()
 post_parser.add_argument('title', type=str, required=True)
 post_parser.add_argument('caption', type=str, required=True)
 post_parser.add_argument('imageURL', type=str, required=False)
-post_parser.add_argument('author_id', type=int, required=True)
 
 class PostList(Resource):
     @jwt_required()
@@ -28,18 +28,13 @@ class PostList(Resource):
     @marshal_with(post_fields)
     def post(self):
         args = post_parser.parse_args()
-        author = User.query.get(args['author_id'])
-        if not author:
-            print(f'User {args["author_id"]} does not exist')
-            abort(404, message=f'User {args["author_id"]} does not exist')
-        if author != current_user(get_jwt_identity()):
-            print('You can only create posts for yourself')
-            abort(403, message='You can only create posts for yourself')
+        author = current_user(get_jwt_identity())
         post = Post(title=args['title'], caption=args['caption'], imageURL=args['imageURL'], author=author)
         db.session.add(post)
         db.session.commit()
         return post, 201
 
+api.add_resource(PostList, '/post')
 class PostDetail(Resource):
     @jwt_required()
     @marshal_with(post_fields)
@@ -58,13 +53,7 @@ class PostDetail(Resource):
             print(f'Post {id} does not exist')
             abort(404, message=f'Post {id} does not exist')
         args = post_parser.parse_args()
-        author = User.query.get(args['author_id'])
-        if not author:
-            print(f'User {args["author_id"]} does not exist')
-            abort(404, message=f'User {args["author_id"]} does not exist')
-        if author != current_user(get_jwt_identity()):
-            print('You can only edit posts for yourself')
-            abort(403, message='You can only edit posts for yourself')
+        author = current_user(get_jwt_identity())
         if post.author != author:
             print('You can only edit posts for yourself')
             abort(403, message='You can only edit posts for yourself')
@@ -86,3 +75,40 @@ class PostDetail(Resource):
         db.session.delete(post)
         db.session.commit()
         return '', 204
+        
+api.add_resource(PostDetail, '/post/<int:id>')
+
+
+class PostofUser(Resource):
+    @jwt_required()
+    @marshal_with(post_fields)
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            print(f'User {user_id} does not exist')
+            abort(404, message=f'User {user_id} does not exist')
+        return user.posts
+
+api.add_resource(PostofUser, '/user/<int:user_id>/posts')
+
+class PostofMe(Resource):
+    @jwt_required()
+    @marshal_with(post_fields)
+    def get(self):
+        user = current_user(get_jwt_identity())
+        return user.posts
+
+api.add_resource(PostofMe, '/user/posts')
+
+class Feed(Resource):
+    @jwt_required()
+    @marshal_with(post_fields)
+    def get(self):
+        user = current_user(get_jwt_identity())
+        posts = []
+        for user2 in user.following:
+            posts += user2.posts
+        posts.sort(key=lambda x: x.time, reverse=True)
+        return posts
+
+api.add_resource(Feed, '/user/feed')

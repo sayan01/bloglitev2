@@ -2,6 +2,7 @@ from models import Comment, Post, User, db
 from flask_jwt_extended import jwt_required, get_jwt_identity
 from auth import current_user
 from flask_restful import Resource, fields, marshal_with, reqparse, marshal, abort
+from api import api
 
 comment_fields = {
     'id': fields.Integer,
@@ -13,7 +14,6 @@ comment_fields = {
 
 comment_parser = reqparse.RequestParser()
 comment_parser.add_argument('content', type=str, required=True)
-comment_parser.add_argument('author_id', type=int, required=True)
 comment_parser.add_argument('post_id', type=int, required=True)
 
 # edit/delete single comment by id (only author can edit/delete)
@@ -35,13 +35,7 @@ class CommentDetail(Resource):
             print(f'Comment {id} does not exist')
             abort(404, message=f'Comment {id} does not exist')
         args = comment_parser.parse_args()
-        author = User.query.get(args['author_id'])
-        if not author:
-            print(f'User {args["author_id"]} does not exist')
-            abort(404, message=f'User {args["author_id"]} does not exist')
-        if author != current_user(get_jwt_identity()):
-            print('You can only edit comments for yourself')
-            abort(403, message='You can only edit comments for yourself')
+        author = current_user(get_jwt_identity())
         post = Post.query.get(args['post_id'])
         if not post:
             print(f'Post {args["post_id"]} does not exist')
@@ -67,6 +61,7 @@ class CommentDetail(Resource):
         db.session.commit()
         return comment
 
+api.add_resource(CommentDetail, '/comment/<int:id>')
 # get all comments for a post
 class CommentList(Resource):
     @jwt_required()
@@ -76,19 +71,13 @@ class CommentList(Resource):
         if not post:
             print(f'Post {post_id} does not exist')
             abort(404, message=f'Post {post_id} does not exist')
-        return post.comments
+        return sorted(post.comments, key=lambda c: c.time, reverse=True)
 
     @jwt_required()
     @marshal_with(comment_fields)
     def post(self, post_id):
         args = comment_parser.parse_args()
-        author = User.query.get(args['author_id'])
-        if not author:
-            print(f'User {args["author_id"]} does not exist')
-            abort(404, message=f'User {args["author_id"]} does not exist')
-        if author != current_user(get_jwt_identity()):
-            print('You can only create comments for yourself')
-            abort(403, message='You can only create comments for yourself')
+        author = current_user(get_jwt_identity())
         post = Post.query.get(post_id)
         if not post:
             print(f'Post {post_id} does not exist')
@@ -97,3 +86,5 @@ class CommentList(Resource):
         db.session.add(comment)
         db.session.commit()
         return comment, 201
+
+api.add_resource(CommentList, '/post/<int:post_id>/comment')

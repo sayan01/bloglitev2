@@ -4,6 +4,7 @@ from flask_restful import Resource, fields, marshal_with, reqparse, marshal, abo
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from auth import current_user
 from datetime import timedelta
+from api import api
 
 login_parser = reqparse.RequestParser()
 login_parser.add_argument('username', type=str, required=True)
@@ -25,3 +26,5 @@ class Login(Resource):
     @jwt_required()
     def get(self):
         return {'login': True, 'message': 'Logged in as {}'.format(current_user(get_jwt_identity()).username)}, 200
+
+api.add_resource(Login, '/user/login')

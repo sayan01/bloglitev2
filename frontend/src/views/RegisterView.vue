@@ -7,7 +7,6 @@ const password = ref('');
 const password2 = ref('');
 const name = ref('');
 const about = ref('');
-const photoURL = ref('');
 const messageError = ref('');
 const messageSuccess = ref('');
 
@@ -22,12 +21,12 @@ const register = () => {
         messageSuccess.value = '';
         return;
     }
-    apiClient.post('/user', {
+    apiClient.post('/users', {
         username: username.value,
         password: password.value,
         name: name.value,
         about: about.value,
-        photoURL: photoURL.value || null,
+        photoURL: null,
     }).then(() => {
         messageSuccess.value = 'Registration successful';
         messageError.value = '';
@@ -61,10 +60,6 @@ const register = () => {
       <div class="input-group mb-3">
         <span class="input-group-text">About</span>
         <input type="text" class="form-control" v-model="about" />
-      </div>
-      <div class="input-group mb-3">
-        <span class="input-group-text">Photo URL</span>
-        <input type="text" class="form-control" v-model="photoURL" />
       </div>
       <div class="message text-danger mb-3">
         {{ messageError }}
