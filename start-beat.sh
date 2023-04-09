@@ -62,8 +62,9 @@ then
   echo "Error Occurred" 
   exit 1 
 fi
-echo "Running flask server"
-if ! gunicorn app:app --worker-class gevent --bind 127.0.0.1:5000 --workers=4 --log-level=debug --log-file=-
+echo "Running celery worker"
+
+if ! celery -A app.celery beat --max-interval 1 --loglevel=info
 then
   echo "Error Occurred" 
   exit 1

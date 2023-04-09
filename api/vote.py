@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from auth import current_user
 from flask_restful import Resource, fields, marshal_with, reqparse, marshal, abort
 from api import api
+from cache import cache
 
 vote_fields = {
     'id': fields.Integer,
@@ -18,6 +19,7 @@ vote_parser.add_argument('post_id', type=int, required=True)
 # edit/delete single vote by id (only author can edit/delete)
 class VoteDetail(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(vote_fields)
     def get(self, id):
         vote = Vote.query.get(id)
@@ -70,6 +72,7 @@ api.add_resource(VoteDetail, '/vote/<int:id>')
 # add new vote to post using post_id in URL or list all votes for post (only author can add new vote)
 class VoteList(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(vote_fields)
     def get(self, post_id):
         post = Post.query.get(post_id)

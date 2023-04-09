@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from auth import current_user
 from flask_restful import Resource, fields, marshal_with, reqparse, marshal, abort
 from api import api
+from cache import cache
 
 user_fields = {
     'id': fields.Integer,
@@ -22,6 +23,7 @@ user_parser.add_argument('photoURL', type=str, required=False)
 
 class UserList(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(user_fields)
     def get(self):
         return User.query.all()
@@ -43,6 +45,7 @@ class UserList(Resource):
 api.add_resource(UserList, '/users')
 class MyUserDetail(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(user_fields)
     def get(self):
         user = current_user(get_jwt_identity())
@@ -77,6 +80,7 @@ api.add_resource(MyUserDetail, '/user')
 
 class UserDetail(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(user_fields)
     def get(self, id):
         user = User.query.get(id)
@@ -91,6 +95,7 @@ api.add_resource(UserDetail, '/user/<int:id>')
 class UserFollow(Resource):
 
     @jwt_required()
+    @cache.cached(timeout=3)
     def get(self, id):
         user = User.query.get(id)
         if not user:
@@ -132,6 +137,7 @@ api.add_resource(UserFollow, '/user/follow/<int:id>')
 # get followers and following of a user
 class UserFollowers(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(user_fields)
     def get(self):
         user = current_user(get_jwt_identity())
@@ -141,6 +147,7 @@ api.add_resource(UserFollowers, '/user/followers')
 
 class UserFollowing(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(user_fields)
     def get(self):
         user = current_user(get_jwt_identity())
@@ -151,6 +158,7 @@ api.add_resource(UserFollowing, '/user/following')
 # get followers and following of a user
 class UserFollowersDetail(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(user_fields)
     def get(self, id):
         user = User.query.get(id)
@@ -163,6 +171,7 @@ api.add_resource(UserFollowersDetail, '/user/<int:id>/followers')
 
 class UserFollowingDetail(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(user_fields)
     def get(self, id):
         user = User.query.get(id)

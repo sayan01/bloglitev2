@@ -6,6 +6,7 @@ import { RouterLink, useRouter } from 'vue-router';
 import ProfileCard from '@/components/ProfileCard.vue';
 import UserPosts from '@/components/UserPosts.vue';
 import ProfileStats from '@/components/ProfileStats.vue';
+import { PHOTO_URL_PREFIX } from '@/defaults';
 
 const router = useRouter();
 
@@ -21,6 +22,25 @@ const getProfile = () => {
             alert('You are not authorized to access this page. Please login again.');
             router.push('/login');
         }
+    });
+}
+
+const exportPosts = () =>{
+    // send a get request to /export which starts backend job and start listening to sse stream for job status
+    apiClient.get('/export')
+    .then(() => {
+        // create a new event source
+        const eventSource = new EventSource(PHOTO_URL_PREFIX + '/stream');
+        // listen to the event source for the job status
+        eventSource.addEventListener('export_posts'+user.value.id, event => {
+            const path = JSON.parse(event.data).path;
+            const abspath = PHOTO_URL_PREFIX + path;
+            // download the file
+            window.open(abspath, '_blank');
+            eventSource.close();
+        })
+    }).catch(err => {
+        console.log(err);
     });
 }
 

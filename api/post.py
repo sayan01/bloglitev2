@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from auth import current_user
 from flask_restful import Resource, fields, marshal_with, reqparse, marshal, abort
 from api import api
+from cache import cache
 
 post_fields = {
     'id': fields.Integer,
@@ -20,6 +21,7 @@ post_parser.add_argument('imageURL', type=str, required=False)
 
 class PostList(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(post_fields)
     def get(self):
         return Post.query.all()
@@ -81,6 +83,7 @@ api.add_resource(PostDetail, '/post/<int:id>')
 
 class PostofUser(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(post_fields)
     def get(self, user_id):
         user = User.query.get(user_id)
@@ -93,6 +96,7 @@ api.add_resource(PostofUser, '/user/<int:user_id>/posts')
 
 class PostofMe(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(post_fields)
     def get(self):
         user = current_user(get_jwt_identity())
@@ -102,6 +106,7 @@ api.add_resource(PostofMe, '/user/posts')
 
 class Feed(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(post_fields)
     def get(self):
         user = current_user(get_jwt_identity())

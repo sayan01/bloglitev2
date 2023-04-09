@@ -1,10 +1,13 @@
 .bin
 bin
 .env
+dump.rdb
 instance
 migrations
 __pycache__
 static/uploads
 static/photos
+static/csv
+static/pdf
 .vscode
 *.zip

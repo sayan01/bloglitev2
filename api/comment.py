@@ -3,6 +3,7 @@ from flask_jwt_extended import jwt_required, get_jwt_identity
 from auth import current_user
 from flask_restful import Resource, fields, marshal_with, reqparse, marshal, abort
 from api import api
+from cache import cache
 
 comment_fields = {
     'id': fields.Integer,
@@ -19,6 +20,7 @@ comment_parser.add_argument('post_id', type=int, required=True)
 # edit/delete single comment by id (only author can edit/delete)
 class CommentDetail(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(comment_fields)
     def get(self, id):
         comment = Comment.query.get(id)
@@ -65,6 +67,7 @@ api.add_resource(CommentDetail, '/comment/<int:id>')
 # get all comments for a post
 class CommentList(Resource):
     @jwt_required()
+    @cache.cached(timeout=3)
     @marshal_with(comment_fields)
     def get(self, post_id):
         post = Post.query.get(post_id)

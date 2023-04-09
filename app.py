@@ -16,5 +16,13 @@ import auth
 
 import api
 
+from worker import celery
+
+import jobs
+
+import sse
+
+from cache import cache
+
 if __name__ == '__main__':
     app.run()
