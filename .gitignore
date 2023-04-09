@@ -1,5 +1,6 @@
 .bin
 bin
+bloglitev2
 .env
 dump.rdb
 instance
