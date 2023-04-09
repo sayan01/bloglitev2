@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import localstorage from '@/localstorage';
+import { setToken } from '@/auth';
 import { apiClient } from '@/axios';
 import {useRouter} from 'vue-router'
 const router = useRouter()
@@ -15,16 +15,11 @@ const login = () => {
         password: password.value,
     })
     .then(res => {
-        localstorage.set('token', res.data.access_token)
+        setToken(res.data.access_token)
         router.push('/')
     })
     .catch(err => {
-        if(err.response.status == 404) {
-            message.value = 'Username does not exist'
-        }
-        else if(err.response.status == 403) {
-            message.value = 'Incorrect password'
-        }
+        message.value = err.response.data.message
     })
 }
 

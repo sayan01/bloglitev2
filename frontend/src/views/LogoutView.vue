@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import localstorage from '@/localstorage';
+import { removeToken } from '@/auth';
 import { useRouter } from 'vue-router';
 const router = useRouter();
 const logout = () => {
-    localstorage.remove('token');
+    removeToken();
     router.push({ name: 'home' });
 }
 </script>
