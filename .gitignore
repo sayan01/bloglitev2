@@ -3,6 +3,7 @@ bin
 bloglitev2
 .env
 dump.rdb
+celerybeat-schedule
 instance
 migrations
 __pycache__
