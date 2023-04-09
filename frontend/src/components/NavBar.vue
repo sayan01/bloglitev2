@@ -6,6 +6,7 @@ import { token } from '@/auth';
   <nav>
     <div class="token" v-if="token">
       <NavLink name="home" />
+      <NavLink name="profile" />
       <NavLink name="logout" />
     </div>
     <div class="no-token" v-else>
