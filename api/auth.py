@@ -1,7 +1,8 @@
 
 from models import User, db
 from flask_restful import Resource, fields, marshal_with, reqparse, marshal, abort
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
+from auth import current_user
 from datetime import timedelta
 
 login_parser = reqparse.RequestParser()
@@ -21,3 +22,6 @@ class Login(Resource):
         access_token = create_access_token(identity=user.id, expires_delta=timedelta(days=1))
         return {'access_token': access_token}, 200
         
+    @jwt_required()
+    def get(self):
+        return {'login': True, 'message': 'Logged in as {}'.format(current_user(get_jwt_identity()).username)}, 200
