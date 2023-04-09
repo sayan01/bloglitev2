@@ -1,0 +1,735 @@
+openapi: 3.0.0
+info:
+  title: Flask-RESTful API
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000
+paths:
+  /user/login:
+    post:
+      summary: Log in user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        200:
+          description: Successfully logged in
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  access_token:
+                    type: string
+                  refresh_token:
+                    type: string
+  /user/logout:
+    post:
+      summary: Log out user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                refresh_token:
+                  type: string
+      responses:
+        200:
+          description: Successfully logged out
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /users:
+    get:
+      summary: Get all users
+      responses:
+        200:
+          description: Successfully retrieved users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+    post:
+      summary: Create a new user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserCreate'
+      responses:
+        201:
+          description: Successfully created user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    /user:
+    get:
+      summary: Get the current user's details
+      responses:
+        200:
+          description: Successfully retrieved user's details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    put:
+      summary: Update the current user's details
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdate'
+      responses:
+        200:
+          description: Successfully updated user's details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        409:
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete the current user
+      responses:
+        204:
+          description: Successfully deleted user
+  /user/{id}:
+    get:
+      summary: Get user details by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successfully retrieved user's details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+   /user/follow/{id}:
+    get:
+      summary: Check if the current user is following another user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successfully checked if the user is following another user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserFollow'
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Follow a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        201:
+          description: Successfully followed the user
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Unfollow a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        204:
+          description: Successfully unfollowed the user
+        400:
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /user/followers:
+    get:
+      summary: Get the list of followers of the current user
+      responses:
+        200:
+          description: Successfully retrieved the list of followers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /user/following:
+    get:
+      summary: Get the list of users the current user is following
+      responses:
+        200:
+          description: Successfully retrieved the list of following users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /user/{id}/followers:
+    get:
+      summary: Get the list of followers of a user by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successfully retrieved the list of followers
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /user/{id}/following:
+    get:
+      summary: Get the list of users a specific user is following by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successfully retrieved the list of following users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /vote/{id}:
+    get:
+      summary: Get a single vote by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successfully retrieved the vote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    put:
+      summary: Update a vote by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                score:
+                  type: integer
+                post_id:
+                  type: integer
+      responses:
+        200:
+          description: Successfully updated the vote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a vote by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successfully deleted the vote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /post/{post_id}/vote:
+    get:
+      summary: Get all votes for a post by post_id
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successfully retrieved the votes
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Vote'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    post:
+      summary: Add a new vote to a post by post_id
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                score:
+                  type: integer
+      responses:
+        201:
+          description: Successfully created the vote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+        403:
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+    delete:
+      summary: Delete a vote for a post by post_id
+      parameters:
+        - name: post_id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Successfully deleted the vote
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Vote'
+        404:
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /comment/{comment_id}:
+      get:
+        summary: Get a comment by comment_id
+        parameters:
+          - name: comment_id
+            in: path
+            required: true
+            schema:
+              type: integer
+        responses:
+          200:
+            description: Successfully retrieved the comment
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Comment'
+          404:
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+      put:
+        summary: Update a comment by comment_id
+        parameters:
+          - name: comment_id
+            in: path
+            required: true
+            schema:
+              type: integer
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+        responses:
+          200:
+            description: Successfully updated the comment
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Comment'
+          403:
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+      delete:
+        summary: Delete a comment by comment_id
+        parameters:
+          - name: comment_id
+            in: path
+            required: true
+            schema:
+              type: integer
+        responses:
+          204:
+            description: Successfully deleted the comment
+          403:
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /post/{post_id}:
+      get:
+        summary: Get a post by post_id
+        parameters:
+          - name: post_id
+            in: path
+            required: true
+            schema:
+              type: integer
+        responses:
+          200:
+            description: Successfully retrieved the post
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Post'
+          404:
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+      put:
+        summary: Update a post by post_id
+        parameters:
+          - name: post_id
+            in: path
+            required: true
+            schema:
+              type: integer
+        requestBody:
+          required: true
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                  text:
+                    type: string
+        responses:
+          200:
+            description: Successfully updated the post
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Post'
+          403:
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+      delete:
+        summary: Delete a post by post_id
+        parameters:
+          - name: post_id
+            in: path
+            required: true
+            schema:
+              type: integer
+        responses:
+          204:
+            description: Successfully deleted the post
+          403:
+            description: Forbidden
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          404:
+            description: Not found
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+  /photo:
+    post:
+      summary: Upload a photo and save it in the filesystem
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                photo:
+                  type: string
+                  format: binary
+      responses:
+        201:
+          description: Successfully uploaded the photo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  path:
+                    type: string
+        400:
+          description: Bad request (file must be an image and less than 1MB)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+        username:
+          type: string
+        name:
+          type: string
+        about:
+          type: string
+        joined:
+          type: string
+          format: date-time
+        photoURL:
+          type: string
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+        title:
+          type: string
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: integer
+        content:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+        user_id:
+          type: integer
+        post_id:
+          type: integer
+
+    Vote:
+      type: object
+      properties:
+        id:
+          type: integer
+        score:
+          type: integer
+        post_id:
+          type: integer
+        user_id:
+          type: integer
+
+    Photo:
+      type: object
+      properties:
+        path:
+          type: string
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
