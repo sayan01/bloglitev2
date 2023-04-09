@@ -5,5 +5,6 @@ import NavLink from './NavLink.vue'
   <nav>
     <NavLink name="home" />
     <NavLink name="login" />
+    <NavLink name="logout" />
   </nav>
 </template>
