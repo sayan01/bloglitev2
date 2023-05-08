@@ -25,7 +25,12 @@ router.beforeEach(async (to) =>{
   if(!token.value) return { name: 'login' }
   // check if token is valid
   setAuthToken(token.value)
-  const resp = (await apiClient.get('/user/login')).status
+  let resp;
+  try{
+    resp = (await apiClient.get('/user/login')).status
+  } catch(e){
+    return {name: 'login'}
+  }
   if(resp !== 200) return { name: 'login' }
   return true
 })
