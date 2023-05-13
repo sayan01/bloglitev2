@@ -1,18 +1,18 @@
-import axios from 'axios';
+import axios from 'axios'
 
 const apiClient = axios.create({
-  baseURL: 'http://localhost:5000', 
+  baseURL: 'http://139.59.54.4',
   headers: {
-    'Content-Type': 'application/json',
-  },
-});
+    'Content-Type': 'application/json'
+  }
+})
 
 function setAuthToken(token: string | null) {
   if (token) {
-    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`
   } else {
-    delete apiClient.defaults.headers.common['Authorization'];
+    delete apiClient.defaults.headers.common['Authorization']
   }
 }
 
-export { apiClient, setAuthToken };
+export { apiClient, setAuthToken }
