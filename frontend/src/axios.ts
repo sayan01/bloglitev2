@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 const apiClient = axios.create({
-  baseURL: 'http://139.59.54.4',
+  baseURL: 'https://bloglite.sayn.work',
   headers: {
     'Content-Type': 'application/json'
   }
