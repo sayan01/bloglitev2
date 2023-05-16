@@ -1,6 +1,7 @@
 #!/bin/env python3
 from flask import Flask
 from flask_cors import CORS
+from flask_sse import sse
 
 app = Flask(__name__)
 CORS(app)
@@ -20,7 +21,7 @@ from worker import celery
 
 import jobs
 
-import sse
+app.register_blueprint(sse, url_prefix='/stream')
 
 from cache import cache
 
